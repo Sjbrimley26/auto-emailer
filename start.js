@@ -8,7 +8,7 @@ emails = [];
 
 function readByLine (emails, parseToArray) {
     var remaining = '';
-    
+
     input.on('data', function(data) {
         remaining += data;
         var index = remaining.indexOf('\n');
@@ -19,15 +19,15 @@ function readByLine (emails, parseToArray) {
             parseToArray(line);
             index = remaining.indexOf('\n', last);
         }
-        
+
         remaining = remaining.substring(last);
     });
-    
+
     input.on('end', function() {
        if (remaining.length > 0) {
            parseToArray(remaining);
            startMailing();
-       } 
+       }
     });
 }
 
@@ -41,8 +41,8 @@ readByLine(emails, parseToArray);
 var transport = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        user: 'donotreply.doormanstan@gmail.com', // Not sure if this can be different from the from line or what
-        pass: 'Yelnats@1' // store as environment variable instead
+        user: process.env.GMAIL_USER, // Not sure if this can be different from the from line or what
+        pass: process.env.GMAIL_PASS // store as environment variable instead
     }
 });
 
@@ -53,7 +53,7 @@ function startMailing () {
             return console.log(err);
         }
         order = data;
-        
+
         emails.forEach(function(address) {
             var email = {
                 from: 'donotreply.doormanstan@gmail.com', // Becky's email so it looks natural
@@ -61,7 +61,7 @@ function startMailing () {
                 subject: "To our friends or some shit",
                 html: order // To be read in from external file, could use regular text instead
             };
-       
+
             transport.sendMail(email, function(err, info){
                if (err) {
                   return console.log(err);
