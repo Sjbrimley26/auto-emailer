@@ -6,48 +6,50 @@ const fs = require("fs");
 
 emails = [];
 
-function readByLine (emails, parseToArray) {
-    var remaining = '';
-
-    input.on('data', function(data) {
-        remaining += data;
-        var index = remaining.indexOf('\n');
-        var last = 0;
-        while (index > -1) {
-            var line = remaining.substring(last, index);
-            last = index + 1;
-            parseToArray(line);
-            index = remaining.indexOf('\n', last);
-        }
-
-        remaining = remaining.substring(last);
-    });
-
-    input.on('end', function() {
-       if (remaining.length > 0) {
-           parseToArray(remaining);
-           startMailing();
-       }
-    });
-}
-
-function parseToArray (data) {
-    emails.push(data);
-}
-
-var emails = fs.createReadStream('emails.txt'); //emails.txt should be newline delineated only
-readByLine(emails, parseToArray);
-
 var transport = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        user: process.env.GMAIL_USER, // Not sure if this can be different from the from line or what
-        pass: process.env.GMAIL_PASS // store as environment variable instead
+        user: process.env.GMAIL_USER, // This is what shows up in the "From" Line of the email, no matter what we put below
+        pass: process.env.GMAIL_PASS
     }
 });
 
+readByLine();
+
+
+function readByLine () { //comma, newline delineated file
+  fs.readFile("emails.txt", "utf-8", (err, data) => {
+    if (err) {
+      return console.log(err);
+    }
+    let info = data;
+    console.log("Reading list of email addresses...");
+    while (info !== "") {
+      let nextIndex = info.indexOf(",");
+      if (nextIndex !== -1) {
+        let line = info.substring(0, nextIndex);
+        emails.push(line);
+        info = info.substring(nextIndex+1);
+      }
+      else {
+        let line = info;
+        emails.push(line);
+        info = "";
+        startMailing();
+      }
+
+    }
+  });
+
+}
+
+
+
+
+
 function startMailing () {
-    var order = "";
+    console.log("Sending emails...");
+    let order = "";
     fs.readFile("letter.txt", (err, data) => { //letter.txt contains the email to be sent in plain text or html
         if (err) {
             return console.log(err);
@@ -56,10 +58,10 @@ function startMailing () {
 
         emails.forEach(function(address) {
             var email = {
-                from: 'donotreply.doormanstan@gmail.com', // Becky's email so it looks natural
+                from: 'donotreply.doormanstan@gmail.com', // Shows as the from email address anyway
                 to: address,
-                subject: "To our friends or some shit",
-                html: order // To be read in from external file, could use regular text instead
+                subject: "Test email",
+                text: order
             };
 
             transport.sendMail(email, function(err, info){
