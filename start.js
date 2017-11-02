@@ -58,7 +58,7 @@ function startMailing () {
 
         emails.forEach(function(address) {
             var email = {
-                from: 'donotreply.doormanstan@gmail.com', // Shows as the from email address anyway
+                from: 'donotreply.doormanstan@gmail.com', // If it doesn't match the email address, it gets marked as spam
                 to: address,
                 subject: "Test email",
                 text: order
@@ -68,7 +68,7 @@ function startMailing () {
                if (err) {
                   return console.log(err);
                }
-               console.log('Message sent ' + info.response);
+               console.log('Message sent to ' + email.to + " " + info.response);
             });
         });
     });
