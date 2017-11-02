@@ -1,0 +1,14 @@
+{
+  "name": "auto-emailer",
+  "version": "1.0.0",
+  "description": "Email a list of people the same message",
+  "main": "start.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Spencer",
+  "license": "ISC",
+  "dependencies": {
+    "nodemailer": "^4.3.1"
+  }
+}
